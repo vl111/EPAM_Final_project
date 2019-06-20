@@ -1,7 +1,7 @@
 package controller.Database;
 
-import model.Entities.Driver;
-import model.Entities.*;
+import model.Driver;
+import model.*;
 
 import java.sql.*;
 
@@ -186,16 +186,16 @@ public class DB_Queries {
 
     public Driver getDriverById(long id) {
         openConnection();
-        model.Entities.Driver driver = null;
+        Driver driver = null;
         ResultSet result;
         synchronized (instance) {
             try {
                 result = statement.executeQuery("select d.driv_name, b.bus_name, b.id," +
                         " d.route_confirmed  from drivers d " +
-                        " left join buses b on d.bus_id where d.id = " + id + ";");//, d.route_id not null
+                        " left join buses b on d.bus_id = b.id where d.id = " + id + ";");//, d.route_id not null
                 conn.commit();
                 if (result.next()) {
-                    driver = new model.Entities.Driver(id, result.getString(1), result.getLong(3),
+                    driver = new Driver(id, result.getString(1), result.getLong(3),
                             result.getBoolean(4));
                 }
 

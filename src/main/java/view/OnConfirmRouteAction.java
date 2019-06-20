@@ -1,9 +1,9 @@
 package view;
 
 import controller.Buspark;
-import model.Entities.Bus;
-import model.Entities.Driver;
-import model.Entities.Route;
+import model.Bus;
+import model.Driver;
+import model.Route;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

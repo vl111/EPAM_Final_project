@@ -1,8 +1,8 @@
 package view;
 
 import controller.Buspark;
-import model.Entities.Bus;
-import model.Entities.Route;
+import model.Bus;
+import model.Route;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

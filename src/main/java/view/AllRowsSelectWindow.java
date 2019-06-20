@@ -3,11 +3,11 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 
-public class AllEntitiesWindow extends JFrame {
+public class AllRowsSelectWindow extends JFrame {
 
     private JTable jTable;
 
-    public AllEntitiesWindow(String[][] rows, String[] columns, String name) {
+    public AllRowsSelectWindow(String[][] rows, String[] columns, String name) {
         super(name);
         setLayout(new FlowLayout());
         setSize(new Dimension(Integer.parseInt(controller.ResourceLoader.getProperties().get("width").toString()),

@@ -1,7 +1,7 @@
 package view;
 
 import controller.Buspark;
-import model.Entities.User;
+import model.User;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

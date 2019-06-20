@@ -19,7 +19,7 @@ public class OnShowAllBuses implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        new AllEntitiesWindow(buspark.getAllBusesInfo(rangeToSelect.get(0), rangeToSelect.get(1)),
+        new AllRowsSelectWindow(buspark.getAllBusesInfo(rangeToSelect.get(0), rangeToSelect.get(1)),
                 columns, "All Buses");
     }
 }

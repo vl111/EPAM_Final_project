@@ -19,7 +19,7 @@ public class OnShowAllRoutes implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        new AllEntitiesWindow(buspark.getAllRoutesInfo(rangeToSelect.get(0), rangeToSelect.get(1)),
+        new AllRowsSelectWindow(buspark.getAllRoutesInfo(rangeToSelect.get(0), rangeToSelect.get(1)),
                 columns, "All Routes");
     }
 }

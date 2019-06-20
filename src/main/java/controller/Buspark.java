@@ -1,10 +1,10 @@
 package controller;
 
 import controller.Database.DB_Queries;
-import model.Entities.Bus;
-import model.Entities.Driver;
-import model.Entities.Route;
-import model.Entities.User;
+import model.Bus;
+import model.Driver;
+import model.Route;
+import model.User;
 
 import java.sql.SQLException;
 
@@ -55,14 +55,19 @@ public class Buspark {
     }
 
     public String signUnsign(Driver dr, Bus bus) {
-        if (dr.getBusId() > 0 && dr.getBusId() == bus.getId()) {
-            dbq.unsignDriverFromBus(dr.getId());
-            return "Usigned driver id: " + dr.getId() + " name: " + dr.getName() +
-                    " from bus: " + bus.getId() + " name: " + bus.getName();
-        } else {
-            dbq.signDriverToBus(dr.getId(), bus.getId());
-            return "Signed driver id: " + dr.getId() + " name: " + dr.getName() +
-                    " to bus: " + bus.getId() + " name: " + bus.getName();
+        try {
+            if (dr.getBusId() > 0 && dr.getBusId() == bus.getId()) {
+                dbq.unsignDriverFromBus(dr.getId());
+                return "Usigned driver id: " + dr.getId() + " name: " + dr.getName() +
+                        " from bus: " + bus.getId() + " name: " + bus.getName();
+            } else {
+                dbq.signDriverToBus(dr.getId(), bus.getId());
+                return "Signed driver id: " + dr.getId() + " name: " + dr.getName() +
+                        " to bus: " + bus.getId() + " name: " + bus.getName();
+            }
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+            return "Wrong input.";
         }
     }
 
@@ -77,9 +82,9 @@ public class Buspark {
                 return "Signed Bus id: " + bus.getId() + " name: " + bus.getName() +
                         " to route: " + route.getId() + " name: " + route.getName();
             }
-        } catch (SQLException e) {
+        } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
-            return "Operation failed.";
+            return "Wrong input.";
         }
     }
 

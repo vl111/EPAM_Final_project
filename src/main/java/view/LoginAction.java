@@ -1,6 +1,6 @@
 package view;
 
-import model.Entities.User;
+import model.User;
 
 interface LoginAction {
 

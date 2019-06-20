@@ -20,7 +20,7 @@ public class OnShowAllDrivers implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        new AllEntitiesWindow(buspark.getAllDriversInfo(rangeToSelect.get(0), rangeToSelect.get(1)),
+        new AllRowsSelectWindow(buspark.getAllDriversInfo(rangeToSelect.get(0), rangeToSelect.get(1)),
                 columns, "All Drivers");
     }
 }

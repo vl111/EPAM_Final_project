@@ -1,9 +1,9 @@
 package view;
 
 import controller.Buspark;
-import model.Entities.Administrator;
-import model.Entities.Driver;
-import model.Entities.User;
+import model.Administrator;
+import model.Driver;
+import model.User;
 
 import javax.swing.*;
 import java.awt.*;

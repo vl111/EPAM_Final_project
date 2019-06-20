@@ -1,4 +1,4 @@
-package model.Entities;
+package model;
 
 public abstract class User {
 
