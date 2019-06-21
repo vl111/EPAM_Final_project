@@ -1,4 +1,4 @@
-package controller;
+package controller.buspark;
 
 import controller.Database.DB_Queries;
 import model.Bus;

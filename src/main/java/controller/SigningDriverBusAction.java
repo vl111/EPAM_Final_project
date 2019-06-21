@@ -1,6 +1,6 @@
-package view;
+package controller;
 
-import controller.Buspark;
+import controller.buspark.Buspark;
 import model.Bus;
 import model.Driver;
 

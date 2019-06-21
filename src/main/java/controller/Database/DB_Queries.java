@@ -1,5 +1,6 @@
 package controller.Database;
 
+import controller.ResourceLoader;
 import model.Driver;
 import model.*;
 
@@ -9,11 +10,10 @@ public class DB_Queries {
 
     private static volatile DB_Queries instance = null;
 
-    private final String NAME = "root";
-    private final String PASSWORD = "1111";
-    private final String CONNECTION_URL = "jdbc:mysql://localhost:3306/parking" +
-            "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false" +
-            "&serverTimezone=UTC";
+    private final String NAME = ResourceLoader.getProperties().get("DB_Name").toString();
+    private final String PASSWORD = ResourceLoader.getProperties().get("DB_Password").toString();
+    ;
+    private final String CONNECTION_URL = ResourceLoader.getProperties().get("connectionURL").toString();
 
     private volatile Connection conn;
     private volatile Statement statement;

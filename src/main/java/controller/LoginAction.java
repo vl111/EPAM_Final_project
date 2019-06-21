@@ -1,8 +1,8 @@
-package view;
+package controller;
 
 import model.User;
 
-interface LoginAction {
+public interface LoginAction {
 
     void updateUIonLogin(User user);
 }

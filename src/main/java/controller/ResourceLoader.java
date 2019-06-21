@@ -29,7 +29,7 @@ public class ResourceLoader {
         try (BufferedReader br = new BufferedReader(isReader)) {
             while ((line = br.readLine()) != null) {
                 line = line.split(";")[0];
-                String[] property = line.split("=");
+                String[] property = line.split(" = ");
                 properties.put(property[0], property[1]);
             }
         } catch (Exception e) {

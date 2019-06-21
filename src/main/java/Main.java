@@ -1,4 +1,4 @@
-import controller.Buspark;
+import controller.buspark.Buspark;
 import view.UserInterface;
 
 
