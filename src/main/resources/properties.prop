@@ -1,5 +1,0 @@
-width = 600;
-height = 600;
-DB_Name = root;
-DB_Password = 1111;
-connectionURL = jdbc:mysql://localhost/parking?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC;

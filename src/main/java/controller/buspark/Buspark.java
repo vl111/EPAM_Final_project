@@ -5,10 +5,12 @@ import model.Bus;
 import model.Driver;
 import model.Route;
 import model.User;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 
 public class Buspark {
+    private final static Logger LOG = Logger.getLogger(Buspark.class.getSimpleName());
 
     private static volatile Buspark instance;
 
@@ -66,6 +68,7 @@ public class Buspark {
                         " to bus: " + bus.getId() + " name: " + bus.getName();
             }
         } catch (NullPointerException ex) {
+            LOG.error("NullException on signing driver to a bus.");
             ex.printStackTrace();
             return "Wrong input.";
         }
@@ -83,6 +86,7 @@ public class Buspark {
                         " to route: " + route.getId() + " name: " + route.getName();
             }
         } catch (SQLException | NullPointerException e) {
+            LOG.error("Exception on signing bus to a route");
             e.printStackTrace();
             return "Wrong input.";
         }

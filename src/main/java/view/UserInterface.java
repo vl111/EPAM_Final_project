@@ -33,7 +33,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
 
         setLayout(new CardLayout());
         setSize(new Dimension(Integer.parseInt(controller.ResourceLoader.getProperties().get("width").toString()),
-                Integer.parseInt(controller.ResourceLoader.getProperties().get("width").toString())));
+                Integer.parseInt(controller.ResourceLoader.getProperties().get("height").toString())));
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

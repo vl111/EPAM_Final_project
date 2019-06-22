@@ -3,16 +3,16 @@ package controller.Database;
 import controller.ResourceLoader;
 import model.Driver;
 import model.*;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 
 public class DB_Queries {
+    private final static Logger LOG = Logger.getLogger(DB_Queries.class.getSimpleName());
 
     private static volatile DB_Queries instance = null;
-
     private final String NAME = ResourceLoader.getProperties().get("DB_Name").toString();
     private final String PASSWORD = ResourceLoader.getProperties().get("DB_Password").toString();
-    ;
     private final String CONNECTION_URL = ResourceLoader.getProperties().get("connectionURL").toString();
 
     private volatile Connection conn;
@@ -22,7 +22,9 @@ public class DB_Queries {
         synchronized (DB_Queries.class) {
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");//com.mysql.jdbc.Driver
+                LOG.info("SQL connector imported.");
             } catch (ClassNotFoundException e) {
+                LOG.error("Class not found.");
                 e.printStackTrace();
             }
 
@@ -34,6 +36,8 @@ public class DB_Queries {
             synchronized (DB_Queries.class) {
                 if (instance == null) {
                     instance = new DB_Queries();
+                    LOG.info("New instance of " + DB_Queries.class.getSimpleName()
+                            + " created.");
                 }
             }
         return instance;
@@ -47,6 +51,7 @@ public class DB_Queries {
                         "VALUES ('" + name + "', '" + password + "');");
                 conn.commit();
             } catch (SQLException e) {
+                LOG.error("SQL exception on adding new driver.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -61,7 +66,9 @@ public class DB_Queries {
                 statement.executeUpdate("INSERT INTO administrators(adm_name, password) " +
                         "VALUES ('" + name + "', '" + password + "');");
                 conn.commit();
+                LOG.info("Administrator added");
             } catch (SQLException e) {
+                LOG.error("Exception on adding administrator.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -76,7 +83,9 @@ public class DB_Queries {
                 statement.executeUpdate("INSERT INTO routes(route_name) " +
                         "VALUES ('" + name + "');");
                 conn.commit();
+                LOG.info("Route added.");
             } catch (SQLException e) {
+                LOG.error("Exception on adding new route.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -92,7 +101,9 @@ public class DB_Queries {
                 statement.executeUpdate("INSERT INTO buses(bus_name) " +
                         "VALUES ('" + name + "');");
                 conn.commit();
+                LOG.info("Bus added.");
             } catch (SQLException e) {
+                LOG.error("Exception on adding new bus.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -107,7 +118,9 @@ public class DB_Queries {
                 statement.executeUpdate("update drivers set bus_id = " + busId
                         + ", route_confirmed = false where id = " + driverId + ";");
                 conn.commit();
+                LOG.info("Driver signed to the bus.");
             } catch (SQLException e) {
+                LOG.error("Exception on signing driver to the bus.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -122,7 +135,9 @@ public class DB_Queries {
                 statement.executeUpdate("update drivers set bus_id = null" +
                         ", route_confirmed = false where id = " + driverId + ";");
                 conn.commit();
+                LOG.info("Driver unsigned from the bus.");
             } catch (SQLException e) {
+                LOG.error("Error on unsigning driver from the bus.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -133,15 +148,20 @@ public class DB_Queries {
     public void signBusToRoute(long busId, long routeId) throws SQLException {
         synchronized (instance) {
             openConnection();
+            LOG.info("Creating savepoint.");
             Savepoint savepoint = conn.setSavepoint("Savepoint");
             try {
+                LOG.warn("Signing bus to route.");
                 statement.executeUpdate("update buses set route_id = " + routeId
                         + " where id = " + busId + ";");
                 statement.executeUpdate("update drivers set " +
                         "route_confirmed = false where bus_id = " + busId + ";");
                 conn.commit();
+                LOG.info("Bus signed to the route.");
             } catch (SQLException e) {
+                LOG.error("Exception on signing Bus to the route.");
                 conn.rollback(savepoint);
+                LOG.info("Rolled back to the savepoint.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -154,12 +174,15 @@ public class DB_Queries {
             openConnection();
             Savepoint savepoint = conn.setSavepoint("Savepoint");
             try {
+                LOG.warn("Unsigning bus from route.");
                 statement.executeUpdate("update buses set route_id = null" +
                         " where id = " + busId + ";");
                 statement.executeUpdate("update drivers set " +
                         "route_confirmed = false where bus_id = " + busId + ";");
                 conn.commit();
+                LOG.info("Bus unsigned from the route.");
             } catch (SQLException e) {
+                LOG.error("Exception on signing Bus from the route.");
                 conn.rollback(savepoint);
                 e.printStackTrace();
             } finally {
@@ -176,7 +199,9 @@ public class DB_Queries {
                 statement.executeUpdate("update drivers set route_confirmed = " +
                         toChange + " where id = " + driver.getId() + ";");
                 conn.commit();
+                LOG.info("route confirmed");
             } catch (SQLException e) {
+                LOG.error("Exception on confirming route.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -190,6 +215,7 @@ public class DB_Queries {
         ResultSet result;
         synchronized (instance) {
             try {
+                LOG.warn("Getting driver by id.");
                 result = statement.executeQuery("select d.driv_name, b.bus_name, b.id," +
                         " d.route_confirmed  from drivers d " +
                         " left join buses b on d.bus_id = b.id where d.id = " + id + ";");//, d.route_id not null
@@ -198,8 +224,8 @@ public class DB_Queries {
                     driver = new Driver(id, result.getString(1), result.getLong(3),
                             result.getBoolean(4));
                 }
-
             } catch (SQLException e) {
+                LOG.error("Error on getting driver by id.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -215,6 +241,7 @@ public class DB_Queries {
         ResultSet result;
         synchronized (instance) {
             try {
+                LOG.warn("Getting bus by id.");
                 result = statement.executeQuery("select bus_name, route_id" +
                         " from buses where id = " + id + ";");
                 conn.commit();
@@ -223,6 +250,7 @@ public class DB_Queries {
                 }
 
             } catch (SQLException e) {
+                LOG.error("Error on getting bus by id");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -237,6 +265,7 @@ public class DB_Queries {
         ResultSet result;
         synchronized (instance) {
             try {
+                LOG.warn("Getting route by id.");
                 result = statement.executeQuery("select id, route_name" +
                         " from routes where id = " + id + ";");
                 conn.commit();
@@ -245,6 +274,7 @@ public class DB_Queries {
                 }
 
             } catch (SQLException e) {
+                LOG.error("Error on getting route by id.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -267,6 +297,7 @@ public class DB_Queries {
                 }
 
             } catch (SQLException e) {
+                LOG.error("Error on getting route by bus");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -281,6 +312,7 @@ public class DB_Queries {
         ResultSet result;
         synchronized (instance) {
             try {
+                LOG.warn("Logging in user.");
                 result = statement.executeQuery("select id, driv_name, bus_id, route_confirmed from drivers  " +
                         "  where id = " + id + " AND password = '" + pass + "';");
 
@@ -294,8 +326,9 @@ public class DB_Queries {
                         user = new Administrator(id, result.getString(2));
                     }
                 }
-
+                LOG.info("User logged in.");
             } catch (SQLException e) {
+                LOG.error("Error on log in user");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -311,6 +344,7 @@ public class DB_Queries {
         String[][] drivers = new String[0][];
         synchronized (instance) {
             try {
+                LOG.warn("Getting drivers.");
                 result = statement.executeQuery("select d.id, d.driv_name, b.id, b.bus_name," +
                         " r.id, r.route_name, d.route_confirmed  from drivers d " +
                         " left join buses b on d.bus_id = b.id " +
@@ -331,6 +365,7 @@ public class DB_Queries {
                 } while (result.next());
 
             } catch (SQLException e) {
+                LOG.error("Error on getting drivers.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -345,6 +380,7 @@ public class DB_Queries {
         String[][] buses = new String[0][];
         synchronized (instance) {
             try {
+                LOG.warn("Getting all Buses.");
                 result = statement.executeQuery("select  b.id, b.bus_name," +
                         " r.id, r.route_name from buses b " +
                         "  left join routes r on b.route_id = r.id" +
@@ -362,6 +398,7 @@ public class DB_Queries {
                 } while (result.next());
 
             } catch (SQLException e) {
+                LOG.error("Error on getting buses.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -376,6 +413,7 @@ public class DB_Queries {
         String[][] routes = new String[0][];
         synchronized (instance) {
             try {
+                LOG.warn("Getting routes");
                 result = statement.executeQuery("select  id, route_name from routes" +
                         " LIMIT " + start + ", " + offset + ";");
                 conn.commit();
@@ -390,6 +428,7 @@ public class DB_Queries {
                 } while (result.next());
 
             } catch (SQLException e) {
+                LOG.error("Error on getting all routes.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -402,6 +441,7 @@ public class DB_Queries {
         synchronized (instance) {
             openConnection();
             try {
+                LOG.warn("Adding tables");
                 statement.executeUpdate("create table if not exists drivers(" +
                         " id integer not null primary key auto_increment," +
                         " password varchar(30) not null, driv_name varchar(25) not null," +
@@ -419,6 +459,7 @@ public class DB_Queries {
                         " route_name varchar(25) not null);");
                 conn.commit();
             } catch (SQLException e) {
+                LOG.error("Error on adding tables.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -434,10 +475,12 @@ public class DB_Queries {
                         conn = DriverManager.getConnection(CONNECTION_URL, NAME, PASSWORD);
                         conn.setAutoCommit(false);
                         statement = conn.createStatement();
+                        LOG.info("Connected to database.");
                     }
                 }
             }
         } catch (SQLException e) {
+            LOG.error("Error on opening connection.");
             e.printStackTrace();
         }
     }
@@ -449,8 +492,10 @@ public class DB_Queries {
                 statement.close();
                 conn = null;
                 statement = null;
+                LOG.info("Database connection closed.");
             }
         } catch (SQLException e) {
+            LOG.error("Error on closing connection.");
             e.printStackTrace();
         }
     }
