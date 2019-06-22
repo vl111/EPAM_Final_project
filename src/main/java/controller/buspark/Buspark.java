@@ -9,6 +9,11 @@ import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 
+/*This class serves as a command class, and it used as an interaction between
+ the UserInterface class and the DB_Queries class.
+ Most methods in this class are simply executes methods from the DB_Queries class.
+* */
+
 public class Buspark {
     private final static Logger LOG = Logger.getLogger(Buspark.class.getSimpleName());
 
@@ -56,6 +61,8 @@ public class Buspark {
         return dbq.getRouteById(id);
     }
 
+    //sets a driver to a bus (or makes dirver free,
+    // if he already signed to the bus passed in params)
     public String signUnsign(Driver dr, Bus bus) {
         try {
             if (dr.getBusId() > 0 && dr.getBusId() == bus.getId()) {
@@ -74,6 +81,8 @@ public class Buspark {
         }
     }
 
+    //sets a bus to a route (or unsignes bus ,
+    // if it already signed to the route passed in params)
     public String signUnsign(Bus bus, Route route) {
         try {
             if (bus.getRouteId() > 0 && route.getId() == bus.getRouteId()) {
@@ -92,6 +101,7 @@ public class Buspark {
         }
     }
 
+    //executes confirmRoute method from the DB_Queries class
     public void confirmRoute(Driver driver) {
         if (driver != null) {
             dbq.confirmRoute(driver);

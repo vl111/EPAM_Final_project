@@ -1,7 +1,8 @@
 package view;
 
-import controller.*;
 import controller.buspark.Buspark;
+import controller.resource_loader.ResourceLoader;
+import controller.ui_logic.*;
 import model.Administrator;
 import model.Driver;
 import model.User;
@@ -12,6 +13,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+
+/*An Instance of this class is a main UI window of this software. It contains
+ * log in panel, administrator panel, and driver panel*/
 
 public class UserInterface extends JFrame implements LoginAction, LogoutAction, ConfirmRouteAction {
 
@@ -32,8 +36,8 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         this.buspark = buspark;
 
         setLayout(new CardLayout());
-        setSize(new Dimension(Integer.parseInt(controller.ResourceLoader.getProperties().get("width").toString()),
-                Integer.parseInt(controller.ResourceLoader.getProperties().get("height").toString())));
+        setSize(new Dimension(Integer.parseInt(ResourceLoader.getProperties().get("width").toString()),
+                Integer.parseInt(ResourceLoader.getProperties().get("height").toString())));
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -42,6 +46,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         rangeToSelect.add(selectionSize);
         rangeToSelect.add(rangeToSelect.get(1));
 
+        //Adding all UI elements of logIn panel below.
         logInPanel = new JPanel();
         adminPanel = new JPanel();
         driverPanel = new JPanel();
@@ -74,6 +79,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         logIn.addActionListener(onLogInAction);
         logOut.addActionListener(new OnLogOutAction(buspark, this));
 
+        //Adding all UI elements of driver panel below.
         driverPanel.setLayout(new BoxLayout(driverPanel, BoxLayout.PAGE_AXIS));
         JButton confirmRouteButton = new JButton("Confirm Route");
         routeConfirmedLabel = new JLabel("    ");
@@ -82,6 +88,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         onConfirmRouteAction = new OnConfirmRouteAction(buspark, this);
         confirmRouteButton.addActionListener(onConfirmRouteAction);
 
+        //adding all the elements of administrator panel below.
         adminPanel.setLayout(new BoxLayout(adminPanel, BoxLayout.PAGE_AXIS));
         JPanel limitSelectContainer = new JPanel();
         final JLabel showRangeToSelect = new JLabel(rangeToSelect.get(0) + " - " +
@@ -146,6 +153,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         signingBusRouteContainer.add(signBusRoute);
         adminPanel.add(signingBusRouteContainer);
 
+        //setVisible should be the last command in constructor.
         setVisible(true);
     }
 
@@ -159,6 +167,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         return instance;
     }
 
+    //invokes from OnLogInAction class, when "login" button is pressed.
     @Override
     public void updateUIonLogin(User user) {
         resultOfLogInOut.setText("Logged in as " + user.getName());
@@ -173,6 +182,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         }
     }
 
+    //invokes from OnLogOutAction class, when "logout" button is pressed.
     @Override
     public void updateUIonLogout() {
         resultOfLogInOut.setText("Logged Out");
@@ -180,6 +190,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         adminPanel.setVisible(false);
     }
 
+    //invokes from OnConfirmRoute class, when "confirm route" button is pressed.
     @Override
     public void updateUIonConfirmRoute(String routeStatus) {
         routeConfirmedLabel.setText(routeStatus);

@@ -1,4 +1,4 @@
-package controller;
+package controller.ui_logic;
 
 import controller.buspark.Buspark;
 import model.Bus;
@@ -7,6 +7,8 @@ import model.Driver;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+/*This is an action listener for the "sign/unsign bus to route" button in main UI.*/
 
 public class SigningDriverBusAction implements ActionListener {
 

@@ -1,6 +1,6 @@
 import controller.Database.DB_Queries;
-import controller.ResourceLoader;
 import controller.buspark.Buspark;
+import controller.resource_loader.ResourceLoader;
 import model.Bus;
 import model.Driver;
 import model.Route;

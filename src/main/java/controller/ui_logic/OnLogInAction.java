@@ -1,4 +1,4 @@
-package controller;
+package controller.ui_logic;
 
 import controller.buspark.Buspark;
 import model.User;
@@ -6,6 +6,8 @@ import model.User;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+/*This is an action listener for the "login" button in main UI.*/
 
 public class OnLogInAction implements ActionListener {
 

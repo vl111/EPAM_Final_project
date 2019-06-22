@@ -1,4 +1,4 @@
-package controller;
+package controller.resource_loader;
 
 import org.apache.log4j.Logger;
 
@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+/*This class loads resources from the globalConfig.properties file*/
 
 public class ResourceLoader {
     private static final Logger LOG = Logger.getLogger(ResourceLoader.class.getSimpleName());

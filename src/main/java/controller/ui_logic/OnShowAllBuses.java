@@ -1,4 +1,4 @@
-package controller;
+package controller.ui_logic;
 
 import controller.buspark.Buspark;
 import view.AllRowsSelectWindow;
@@ -6,6 +6,8 @@ import view.AllRowsSelectWindow;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+
+/*This is an action listener for the "show all buses" button in main UI.*/
 
 public class OnShowAllBuses implements ActionListener {
 

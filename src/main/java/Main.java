@@ -1,5 +1,5 @@
-import controller.ResourceLoader;
 import controller.buspark.Buspark;
+import controller.resource_loader.ResourceLoader;
 import view.UserInterface;
 
 
@@ -16,7 +16,7 @@ public class Main {
 
         new ResourceLoader();
         Buspark bp = Buspark.getInstance();
-        UserInterface.getInstance(bp, "name", 10);
+        UserInterface.getInstance(bp, "Bus park", 10);
     }
 
 }

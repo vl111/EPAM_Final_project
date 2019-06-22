@@ -1,4 +1,4 @@
-package controller;
+package controller.ui_logic;
 
 import controller.buspark.Buspark;
 import model.Bus;
@@ -7,6 +7,8 @@ import model.Route;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+/*This is an action listener for the "confirm route" button in main UI.*/
 
 public class OnConfirmRouteAction implements ActionListener {
 

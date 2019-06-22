@@ -1,11 +1,14 @@
 package controller.Database;
 
-import controller.ResourceLoader;
+import controller.resource_loader.ResourceLoader;
 import model.Driver;
 import model.*;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
+
+/*This class contains all the queries to SQL database.
+ * */
 
 public class DB_Queries {
     private final static Logger LOG = Logger.getLogger(DB_Queries.class.getSimpleName());
@@ -191,6 +194,7 @@ public class DB_Queries {
         }
     }
 
+    //reverses the value of route_confirmed in driver table;
     public void confirmRoute(Driver driver) {
         synchronized (instance) {
             openConnection();
@@ -306,6 +310,7 @@ public class DB_Queries {
         }
     }
 
+    //Method returns logged in use in case success, and null in case fail.
     public User logInUser(long id, String pass) {
         openConnection();
         User user = null;
@@ -338,6 +343,8 @@ public class DB_Queries {
 
     }
 
+    //Returns an array of drivers, where each row represents a driver
+    // and elements in a row are driver`s params
     public String[][] getAllDrivers(int start, int offset) {
         openConnection();
         ResultSet result;
@@ -374,6 +381,7 @@ public class DB_Queries {
         }
     }
 
+    //Returns an array of parameters of buses.
     public String[][] getAllBuses(int start, int offset) {
         openConnection();
         ResultSet result;
@@ -407,6 +415,7 @@ public class DB_Queries {
         }
     }
 
+    //Returns an array of parameters of routes.
     public String[][] getAllRoutes(int start, int offset) {
         openConnection();
         ResultSet result;
@@ -437,6 +446,7 @@ public class DB_Queries {
         }
     }
 
+    //This method adds four tables to DB: drivers, administrators, buses, routes.
     public void addTables() {
         synchronized (instance) {
             openConnection();

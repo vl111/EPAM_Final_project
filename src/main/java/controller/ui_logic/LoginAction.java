@@ -1,4 +1,4 @@
-package controller;
+package controller.ui_logic;
 
 import model.User;
 

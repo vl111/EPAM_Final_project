@@ -17,4 +17,5 @@ public abstract class User {
     public String getName() {
         return name;
     }
+
 }
