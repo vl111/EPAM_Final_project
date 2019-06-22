@@ -2,45 +2,35 @@ package controller;
 
 import org.apache.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 public class ResourceLoader {
     private static final Logger LOG = Logger.getLogger(ResourceLoader.class.getSimpleName());
+    private static Map<Object, Object> properties;
 
-    private static final String resourceName = "src/main/resources/globalProperties.properties";
-    private static Map<String, Object> properties;
-
-    static {
+    {
         properties = new HashMap<>();
         loadResources();
         LOG.info("Resourced loaded.");
     }
 
-    private static void loadResources() {
-        InputStreamReader isReader = null;
-        try {
-            isReader = new InputStreamReader(
-                    new FileInputStream(resourceName));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        String line;
-        try (BufferedReader br = new BufferedReader(isReader)) {
-            while ((line = br.readLine()) != null) {
-                String[] property = line.split(" = ");
-                properties.put(property[0], property[1]);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static Map<Object, Object> getProperties() {
+        return properties;
     }
 
-    public static Map<String, Object> getProperties() {
-        return properties;
+    private void loadResources() {
+        InputStream fis = getClass().getClassLoader().getResourceAsStream("globalConfig.properties");
+        Properties prop = new Properties();
+        try {
+            prop.load(fis);
+        } catch (IOException e) {
+            LOG.error("Error on loading resources.");
+            e.printStackTrace();
+        }
+        prop.forEach((k, v) -> properties.put(k, v));
     }
 }
