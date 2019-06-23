@@ -1,6 +1,7 @@
 package controller.ui_logic;
 
 import controller.buspark.Buspark;
+import controller.resource_loader.Localization;
 import model.Bus;
 import model.Driver;
 import model.Route;
@@ -26,11 +27,11 @@ public class OnConfirmRouteAction implements ActionListener {
     public void getDriverBusRoute() {
         bus = buspark.getBusByDriver(driver);
         route = buspark.getRouteByBus(bus);
-        driver = ((Driver) buspark.getCurrentLogedInUser());
+        driver = ((Driver) buspark.getCurrentLoggedInUser());
     }
 
     public void confirmRoute() {
-        if ((buspark.getCurrentLogedInUser() != null) && bus != null && route != null) {
+        if ((buspark.getCurrentLoggedInUser() != null) && bus != null && route != null) {
             buspark.confirmRoute(driver);
             driver.setRouteConfirmed(!driver.isRouteConfirmed());
         }
@@ -42,11 +43,10 @@ public class OnConfirmRouteAction implements ActionListener {
             routeStatus = ("Route #" + route.getId() + " by the name " +
                     route.getName() + " is " + ((driver).isRouteConfirmed() ?
                     "" : "not ") + "confirmed. Asassigned Bus #" + bus.getId() + " by the name " + bus.getName());
-            // ((Driver)buspark.getCurrentLogedInUser()).setRouteConfirmed(true);111111111111111111
         } else if (route == null && bus != null) {
             routeStatus = ("Asassigned Bus #" + bus.getId() + " by the name " + bus.getName());
         } else {
-            routeStatus = ("No routes or buses asassigned.");
+            routeStatus = (Localization.getLocalizedValue("nothingAssigned"));
         }
         confirmRouteAction.updateUIonConfirmRoute(routeStatus);
     }

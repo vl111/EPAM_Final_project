@@ -1,6 +1,7 @@
 package controller.buspark;
 
 import controller.Database.DB_Queries;
+import controller.resource_loader.Localization;
 import model.Bus;
 import model.Driver;
 import model.Route;
@@ -19,7 +20,7 @@ public class Buspark {
 
     private static volatile Buspark instance;
 
-    private User currentLogedInUser;
+    private User currentLoggedInUser;
     private DB_Queries dbq;
 
     private Buspark() {
@@ -40,13 +41,13 @@ public class Buspark {
         User user = null;
         user = dbq.logInUser(id, password);
         if (user != null) {
-            currentLogedInUser = user;
+            currentLoggedInUser = user;
         }
-        return currentLogedInUser;
+        return currentLoggedInUser;
     }
 
     public void logOut() {
-        currentLogedInUser = null;
+        currentLoggedInUser = null;
     }
 
     public Driver getDriverById(long id) {
@@ -77,7 +78,7 @@ public class Buspark {
         } catch (NullPointerException ex) {
             LOG.error("NullException on assigning driver to a bus.");
             ex.printStackTrace();
-            return "Wrong input.";
+            return Localization.getLocalizedValue("wrongInput");
         }
     }
 
@@ -97,7 +98,7 @@ public class Buspark {
         } catch (SQLException | NullPointerException e) {
             LOG.error("Exception on assigning bus to a route");
             e.printStackTrace();
-            return "Wrong input.";
+            return Localization.getLocalizedValue("wrongInput");
         }
     }
 
@@ -133,8 +134,8 @@ public class Buspark {
         else return null;
     }
 
-    public User getCurrentLogedInUser() {
-        return currentLogedInUser;
+    public User getCurrentLoggedInUser() {
+        return currentLoggedInUser;
     }
 
 

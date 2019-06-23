@@ -1,6 +1,7 @@
 package controller.ui_logic;
 
 import controller.buspark.Buspark;
+import controller.resource_loader.Localization;
 import model.Bus;
 import model.Driver;
 
@@ -23,13 +24,12 @@ public class AssigningDriverBusAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         try {
             Driver driver = buspark.getDriverById(Long.parseLong(driverField.getText()));
             Bus bus = buspark.getBusById(Long.parseLong(busField.getText()));
             JOptionPane.showMessageDialog(null, buspark.assignUnassign(driver, bus));
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Wrong id.");
+            JOptionPane.showMessageDialog(null, Localization.getLocalizedValue("wrongId"));
         }
     }
 }

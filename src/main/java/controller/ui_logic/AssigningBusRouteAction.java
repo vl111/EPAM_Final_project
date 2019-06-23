@@ -1,6 +1,7 @@
 package controller.ui_logic;
 
 import controller.buspark.Buspark;
+import controller.resource_loader.Localization;
 import model.Bus;
 import model.Route;
 
@@ -29,7 +30,7 @@ public class AssigningBusRouteAction implements ActionListener {
             Route route = buspark.getRouteById(Long.parseLong(routeField.getText()));
             JOptionPane.showMessageDialog(null, buspark.assignUnassign(bus, route));
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Wrong id.");
+            JOptionPane.showMessageDialog(null, Localization.getLocalizedValue("wrongId"));
         }
     }
 }

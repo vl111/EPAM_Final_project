@@ -1,6 +1,7 @@
 package view;
 
 import controller.buspark.Buspark;
+import controller.resource_loader.Localization;
 import controller.resource_loader.ResourceLoader;
 import controller.ui_logic.*;
 import model.Administrator;
@@ -50,8 +51,8 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         logInPanel = new JPanel();
         adminPanel = new JPanel();
         driverPanel = new JPanel();
-        adminPanel.add(new JLabel("Administrator Panel"));
-        driverPanel.add(new JLabel("Driver Panel"));
+        adminPanel.add(new JLabel(Localization.getLocalizedValue("administratorPanel")));
+        driverPanel.add(new JLabel(Localization.getLocalizedValue("driverPanel")));
         adminPanel.setVisible(false);
         driverPanel.setVisible(false);
         superPanel = new JPanel();
@@ -65,15 +66,15 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         logInPanel.add(new JLabel("    id:  "));
         id = new JTextField(15);
         logInPanel.add(id);
-        logInPanel.add(new JLabel("password:  "));
+        logInPanel.add(new JLabel(Localization.getLocalizedValue("password")));
         password = new JPasswordField(15);
         ((JPasswordField) password).setEchoChar('*');
         logInPanel.add(password);
-        logIn = new JButton("LogIn");
+        logIn = new JButton(Localization.getLocalizedValue("logIn"));
         logInPanel.add(logIn);
-        logOut = new JButton("LogOut");
+        logOut = new JButton(Localization.getLocalizedValue("logOut"));
         logInPanel.add(logOut);
-        resultOfLogInOut = new JLabel("LogedOut");
+        resultOfLogInOut = new JLabel(Localization.getLocalizedValue("loggedOut"));
         logInPanel.add(resultOfLogInOut);
         onLogInAction = new OnLogInAction(buspark, this, id, password);
         logIn.addActionListener(onLogInAction);
@@ -81,7 +82,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
 
         //Adding all UI elements of driver panel below.
         driverPanel.setLayout(new BoxLayout(driverPanel, BoxLayout.PAGE_AXIS));
-        JButton confirmRouteButton = new JButton("Confirm Route");
+        JButton confirmRouteButton = new JButton(Localization.getLocalizedValue("confirmRoute"));
         routeConfirmedLabel = new JLabel("    ");
         driverPanel.add(routeConfirmedLabel);
         driverPanel.add(confirmRouteButton);
@@ -117,13 +118,13 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         limitSelectContainer.add(moveBack);
         limitSelectContainer.add(moveForward);
         adminPanel.add(limitSelectContainer);
-        JButton selectAllDrivers = new JButton("Show all drivers");
+        JButton selectAllDrivers = new JButton(Localization.getLocalizedValue("showAllDrivers"));
         selectAllDrivers.addActionListener(new OnShowAllDrivers(buspark, rangeToSelect));
         adminPanel.add(selectAllDrivers);
-        JButton selectAllBuses = new JButton("Show all buses");
+        JButton selectAllBuses = new JButton(Localization.getLocalizedValue("showAllBuses"));
         selectAllBuses.addActionListener(new OnShowAllBuses(buspark, rangeToSelect));
         adminPanel.add(selectAllBuses);
-        JButton selectAllRoutes = new JButton("Show all routes");
+        JButton selectAllRoutes = new JButton(Localization.getLocalizedValue("showAllRoutes"));
         selectAllRoutes.addActionListener(new OnShowAllRoutes(buspark, rangeToSelect));
         adminPanel.add(selectAllRoutes);
 
@@ -134,7 +135,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         assigningDriverBusContainer.add(driverId);
         assigningDriverBusContainer.add(new JLabel("Bus id:"));
         assigningDriverBusContainer.add(busId);
-        JButton assignDriverOnBus = new JButton("Assign/Unassign");
+        JButton assignDriverOnBus = new JButton(Localization.getLocalizedValue("assignUnassign"));
         assignDriverOnBus.addActionListener(new AssigningDriverBusAction(buspark,
                 driverId, busId));
         assigningDriverBusContainer.add(assignDriverOnBus);
@@ -147,7 +148,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         assigningBusRouteContainer.add(busId1);
         assigningBusRouteContainer.add(new JLabel("Route id:"));
         assigningBusRouteContainer.add(routeId);
-        JButton assignBusRoute = new JButton("Assign/Unassign");
+        JButton assignBusRoute = new JButton(Localization.getLocalizedValue("assignUnassign"));
         assignBusRoute.addActionListener(new AssigningBusRouteAction(buspark,
                 busId1, routeId));
         assigningBusRouteContainer.add(assignBusRoute);
@@ -170,7 +171,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
     //invokes from OnLogInAction class, when "login" button is pressed.
     @Override
     public void updateUIonLogin(User user) {
-        resultOfLogInOut.setText("Logged in as " + user.getName());
+        resultOfLogInOut.setText(Localization.getLocalizedValue("loggedIn") + user.getName());
         if (user instanceof Driver) {
             driverPanel.setVisible(true);
             adminPanel.setVisible(false);
@@ -185,7 +186,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
     //invokes from OnLogOutAction class, when "logout" button is pressed.
     @Override
     public void updateUIonLogout() {
-        resultOfLogInOut.setText("Logged Out");
+        resultOfLogInOut.setText(Localization.getLocalizedValue("loggedOut"));
         driverPanel.setVisible(false);
         adminPanel.setVisible(false);
     }

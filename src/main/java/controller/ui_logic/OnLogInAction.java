@@ -1,6 +1,7 @@
 package controller.ui_logic;
 
 import controller.buspark.Buspark;
+import controller.resource_loader.Localization;
 import model.User;
 
 import javax.swing.*;
@@ -30,7 +31,7 @@ public class OnLogInAction implements ActionListener {
             if (user != null)
                 loginAction.updateUIonLogin(user);
         } catch (NumberFormatException numEx) {
-            JOptionPane.showMessageDialog(null, "Wrong id.");
+            JOptionPane.showMessageDialog(null, Localization.getLocalizedValue("wrongId"));
         }
     }
 }
