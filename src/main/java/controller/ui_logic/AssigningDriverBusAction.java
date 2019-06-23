@@ -2,22 +2,22 @@ package controller.ui_logic;
 
 import controller.buspark.Buspark;
 import model.Bus;
-import model.Route;
+import model.Driver;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/*This is an action listener for the "sign/unsign bus to driver" button in main UI.*/
+/*This is an action listener for the "assign/unassign bus to route" button in main UI.*/
 
-public class SigningBusRouteAction implements ActionListener {
+public class AssigningDriverBusAction implements ActionListener {
 
-    private JTextField busField, routeField;
+    private JTextField driverField, busField;
     private Buspark buspark;
 
-    public SigningBusRouteAction(Buspark buspark, JTextField busField, JTextField routeField) {
+    public AssigningDriverBusAction(Buspark buspark, JTextField driverField, JTextField busField) {
+        this.driverField = driverField;
         this.busField = busField;
-        this.routeField = routeField;
         this.buspark = buspark;
     }
 
@@ -25,9 +25,9 @@ public class SigningBusRouteAction implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         try {
+            Driver driver = buspark.getDriverById(Long.parseLong(driverField.getText()));
             Bus bus = buspark.getBusById(Long.parseLong(busField.getText()));
-            Route route = buspark.getRouteById(Long.parseLong(routeField.getText()));
-            JOptionPane.showMessageDialog(null, buspark.signUnsign(bus, route));
+            JOptionPane.showMessageDialog(null, buspark.assignUnassign(driver, bus));
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(null, "Wrong id.");
         }

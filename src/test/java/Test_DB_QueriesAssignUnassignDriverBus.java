@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Order;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class Test_DB_QueriesSignUnsignDriverBus extends DB_QueriesTest {
+public class Test_DB_QueriesAssignUnassignDriverBus extends DB_QueriesTest {
 
     @Before
     public void setup() {
@@ -39,14 +39,14 @@ public class Test_DB_QueriesSignUnsignDriverBus extends DB_QueriesTest {
 
     @Test
     @Order(2)
-    public void testSignUnsignDriverBus() {
-        buspark.signUnsign(d, b);
+    public void testAssignUnassignDriverBus() {
+        buspark.assignUnassign(d, b);
         d = getDriverByName(testDriverName);
         assertEquals(true, d.getBusId() > 0);
-        buspark.signUnsign(d, b);
+        buspark.assignUnassign(d, b);
         d = getDriverByName(testDriverName);
         assertEquals(false, d.getBusId() > 0);
-        buspark.signUnsign(d, b);
+        buspark.assignUnassign(d, b);
         d = getDriverByName(testDriverName);
         assertEquals(true, d.getBusId() > 0);
     }

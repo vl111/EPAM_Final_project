@@ -114,16 +114,16 @@ public class DB_Queries {
         }
     }
 
-    public void signDriverToBus(long driverId, long busId) {
+    public void assignDriverToBus(long driverId, long busId) {
         synchronized (instance) {
             openConnection();
             try {
                 statement.executeUpdate("update drivers set bus_id = " + busId
                         + ", route_confirmed = false where id = " + driverId + ";");
                 conn.commit();
-                LOG.info("Driver signed to the bus.");
+                LOG.info("Driver assigned to the bus.");
             } catch (SQLException e) {
-                LOG.error("Exception on signing driver to the bus.");
+                LOG.error("Exception on assigning driver to the bus.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -131,16 +131,16 @@ public class DB_Queries {
         }
     }
 
-    public void unsignDriverFromBus(long driverId) {
+    public void unassignDriverFromBus(long driverId) {
         synchronized (instance) {
             openConnection();
             try {
                 statement.executeUpdate("update drivers set bus_id = null" +
                         ", route_confirmed = false where id = " + driverId + ";");
                 conn.commit();
-                LOG.info("Driver unsigned from the bus.");
+                LOG.info("Driver unassigned from the bus.");
             } catch (SQLException e) {
-                LOG.error("Error on unsigning driver from the bus.");
+                LOG.error("Error on unassigning driver from the bus.");
                 e.printStackTrace();
             } finally {
                 closeConnection();
@@ -148,21 +148,21 @@ public class DB_Queries {
         }
     }
 
-    public void signBusToRoute(long busId, long routeId) throws SQLException {
+    public void assignBusToRoute(long busId, long routeId) throws SQLException {
         synchronized (instance) {
             openConnection();
             LOG.info("Creating savepoint.");
             Savepoint savepoint = conn.setSavepoint("Savepoint");
             try {
-                LOG.warn("Signing bus to route.");
+                LOG.warn("Assigning bus to route.");
                 statement.executeUpdate("update buses set route_id = " + routeId
                         + " where id = " + busId + ";");
                 statement.executeUpdate("update drivers set " +
                         "route_confirmed = false where bus_id = " + busId + ";");
                 conn.commit();
-                LOG.info("Bus signed to the route.");
+                LOG.info("Bus assigned to the route.");
             } catch (SQLException e) {
-                LOG.error("Exception on signing Bus to the route.");
+                LOG.error("Exception on assigning Bus to the route.");
                 conn.rollback(savepoint);
                 LOG.info("Rolled back to the savepoint.");
                 e.printStackTrace();
@@ -172,20 +172,20 @@ public class DB_Queries {
         }
     }
 
-    public void unsignBusFromRoute(long busId) throws SQLException {
+    public void unassignBusFromRoute(long busId) throws SQLException {
         synchronized (instance) {
             openConnection();
             Savepoint savepoint = conn.setSavepoint("Savepoint");
             try {
-                LOG.warn("Unsigning bus from route.");
+                LOG.warn("Unassigning bus from route.");
                 statement.executeUpdate("update buses set route_id = null" +
                         " where id = " + busId + ";");
                 statement.executeUpdate("update drivers set " +
                         "route_confirmed = false where bus_id = " + busId + ";");
                 conn.commit();
-                LOG.info("Bus unsigned from the route.");
+                LOG.info("Bus unassigned from the route.");
             } catch (SQLException e) {
-                LOG.error("Exception on signing Bus from the route.");
+                LOG.error("Exception on assigning Bus from the route.");
                 conn.rollback(savepoint);
                 e.printStackTrace();
             } finally {

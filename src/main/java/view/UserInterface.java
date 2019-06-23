@@ -127,31 +127,31 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         selectAllRoutes.addActionListener(new OnShowAllRoutes(buspark, rangeToSelect));
         adminPanel.add(selectAllRoutes);
 
-        JPanel signingDriverBusContainer = new JPanel(new FlowLayout());
+        JPanel assigningDriverBusContainer = new JPanel(new FlowLayout());
         JTextField busId = new JTextField(10),
                 driverId = new JTextField(10);
-        signingDriverBusContainer.add(new JLabel("Driver id:"));
-        signingDriverBusContainer.add(driverId);
-        signingDriverBusContainer.add(new JLabel("Bus id:"));
-        signingDriverBusContainer.add(busId);
-        JButton signDriverOnBus = new JButton("Sign/Unsign");
-        signDriverOnBus.addActionListener(new SigningDriverBusAction(buspark,
+        assigningDriverBusContainer.add(new JLabel("Driver id:"));
+        assigningDriverBusContainer.add(driverId);
+        assigningDriverBusContainer.add(new JLabel("Bus id:"));
+        assigningDriverBusContainer.add(busId);
+        JButton assignDriverOnBus = new JButton("Assign/Unassign");
+        assignDriverOnBus.addActionListener(new AssigningDriverBusAction(buspark,
                 driverId, busId));
-        signingDriverBusContainer.add(signDriverOnBus);
-        adminPanel.add(signingDriverBusContainer);
+        assigningDriverBusContainer.add(assignDriverOnBus);
+        adminPanel.add(assigningDriverBusContainer);
 
-        JPanel signingBusRouteContainer = new JPanel(new FlowLayout());
+        JPanel assigningBusRouteContainer = new JPanel(new FlowLayout());
         JTextField busId1 = new JTextField(10),
                 routeId = new JTextField(10);
-        signingBusRouteContainer.add(new JLabel("Bus id:"));
-        signingBusRouteContainer.add(busId1);
-        signingBusRouteContainer.add(new JLabel("Route id:"));
-        signingBusRouteContainer.add(routeId);
-        JButton signBusRoute = new JButton("Sign/Unsign");
-        signBusRoute.addActionListener(new SigningBusRouteAction(buspark,
+        assigningBusRouteContainer.add(new JLabel("Bus id:"));
+        assigningBusRouteContainer.add(busId1);
+        assigningBusRouteContainer.add(new JLabel("Route id:"));
+        assigningBusRouteContainer.add(routeId);
+        JButton assignBusRoute = new JButton("Assign/Unassign");
+        assignBusRoute.addActionListener(new AssigningBusRouteAction(buspark,
                 busId1, routeId));
-        signingBusRouteContainer.add(signBusRoute);
-        adminPanel.add(signingBusRouteContainer);
+        assigningBusRouteContainer.add(assignBusRoute);
+        adminPanel.add(assigningBusRouteContainer);
 
         //setVisible should be the last command in constructor.
         setVisible(true);

@@ -25,7 +25,7 @@ project.log
 .idea/**/dataSources.local.xml
 .idea/**/sqlDataSources.xml
 .idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
+.idea/**/uiDeassigner.xml
 .idea/**/dbnavigator.xml
 
 # Gradle

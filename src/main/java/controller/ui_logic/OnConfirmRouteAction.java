@@ -41,12 +41,12 @@ public class OnConfirmRouteAction implements ActionListener {
         if (bus != null && route != null) {
             routeStatus = ("Route #" + route.getId() + " by the name " +
                     route.getName() + " is " + ((driver).isRouteConfirmed() ?
-                    "" : "not ") + "confirmed. Assigned Bus #" + bus.getId() + " by the name " + bus.getName());
+                    "" : "not ") + "confirmed. Asassigned Bus #" + bus.getId() + " by the name " + bus.getName());
             // ((Driver)buspark.getCurrentLogedInUser()).setRouteConfirmed(true);111111111111111111
         } else if (route == null && bus != null) {
-            routeStatus = ("Assigned Bus #" + bus.getId() + " by the name " + bus.getName());
+            routeStatus = ("Asassigned Bus #" + bus.getId() + " by the name " + bus.getName());
         } else {
-            routeStatus = ("No routes or buses assigned.");
+            routeStatus = ("No routes or buses asassigned.");
         }
         confirmRouteAction.updateUIonConfirmRoute(routeStatus);
     }

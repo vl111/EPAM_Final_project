@@ -62,40 +62,40 @@ public class Buspark {
     }
 
     //sets a driver to a bus (or makes dirver free,
-    // if he already signed to the bus passed in params)
-    public String signUnsign(Driver dr, Bus bus) {
+    // if he already assigned to the bus passed in params)
+    public String assignUnassign(Driver dr, Bus bus) {
         try {
             if (dr.getBusId() > 0 && dr.getBusId() == bus.getId()) {
-                dbq.unsignDriverFromBus(dr.getId());
-                return "Usigned driver id: " + dr.getId() + " name: " + dr.getName() +
+                dbq.unassignDriverFromBus(dr.getId());
+                return "Unassigned driver id: " + dr.getId() + " name: " + dr.getName() +
                         " from bus: " + bus.getId() + " name: " + bus.getName();
             } else {
-                dbq.signDriverToBus(dr.getId(), bus.getId());
-                return "Signed driver id: " + dr.getId() + " name: " + dr.getName() +
+                dbq.assignDriverToBus(dr.getId(), bus.getId());
+                return "Assigned driver id: " + dr.getId() + " name: " + dr.getName() +
                         " to bus: " + bus.getId() + " name: " + bus.getName();
             }
         } catch (NullPointerException ex) {
-            LOG.error("NullException on signing driver to a bus.");
+            LOG.error("NullException on assigning driver to a bus.");
             ex.printStackTrace();
             return "Wrong input.";
         }
     }
 
-    //sets a bus to a route (or unsignes bus ,
-    // if it already signed to the route passed in params)
-    public String signUnsign(Bus bus, Route route) {
+    //sets a bus to a route (or unassignes bus ,
+    // if it already assigned to the route passed in params)
+    public String assignUnassign(Bus bus, Route route) {
         try {
             if (bus.getRouteId() > 0 && route.getId() == bus.getRouteId()) {
-                dbq.unsignBusFromRoute(bus.getId());
-                return "Usigned Bus id: " + bus.getId() + " name: " + bus.getName() +
+                dbq.unassignBusFromRoute(bus.getId());
+                return "Unassigned Bus id: " + bus.getId() + " name: " + bus.getName() +
                         " from route: " + route.getId() + " name: " + route.getName();
             } else {
-                dbq.signBusToRoute(bus.getId(), route.getId());
-                return "Signed Bus id: " + bus.getId() + " name: " + bus.getName() +
+                dbq.assignBusToRoute(bus.getId(), route.getId());
+                return "Assigned Bus id: " + bus.getId() + " name: " + bus.getName() +
                         " to route: " + route.getId() + " name: " + route.getName();
             }
         } catch (SQLException | NullPointerException e) {
-            LOG.error("Exception on signing bus to a route");
+            LOG.error("Exception on assigning bus to a route");
             e.printStackTrace();
             return "Wrong input.";
         }
