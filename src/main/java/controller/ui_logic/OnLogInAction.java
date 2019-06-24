@@ -28,9 +28,10 @@ public class OnLogInAction implements ActionListener {
         try {
             long id = Long.parseLong(this.id.getText());
             User user = busPark.logIn(id, password.getText());
-            if (user != null)
-                loginAction.updateUIonLogin(user);
-        } catch (NumberFormatException numEx) {
+            if (user == null)
+                throw new NullPointerException();
+            loginAction.updateUIonLogin(user);
+        } catch (NumberFormatException | NullPointerException ex) {
             JOptionPane.showMessageDialog(null, Localization.getLocalizedValue("wrongId"));
         }
     }

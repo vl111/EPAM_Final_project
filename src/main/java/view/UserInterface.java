@@ -47,7 +47,6 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         rangeToSelect.add(selectionSize);
         rangeToSelect.add(rangeToSelect.get(1));
 
-        //Adding all UI elements of logIn panel below.
         logInPanel = new JPanel();
         adminPanel = new JPanel();
         driverPanel = new JPanel();
@@ -62,6 +61,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         superPanel.add(driverPanel);
         add(superPanel);
 
+        //Adding all UI elements of logIn panel below.
         logInPanel.setLayout(new FlowLayout());
         logInPanel.add(new JLabel("    id:  "));
         id = new JTextField(15);
@@ -194,6 +194,7 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
     //invokes from OnConfirmRoute class, when "confirm route" button is pressed.
     @Override
     public void updateUIonConfirmRoute(String routeStatus) {
+
         routeConfirmedLabel.setText(routeStatus);
     }
 }

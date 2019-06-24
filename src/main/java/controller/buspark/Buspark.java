@@ -9,7 +9,7 @@ import model.Driver;
 import model.Route;
 import model.User;
 import org.apache.log4j.Logger;
-import view.BusParkMessage;
+import view.Message;
 
 import java.sql.SQLException;
 
@@ -45,7 +45,7 @@ public class Buspark {
         try {
             user = dbq.logInUser(id, password);
         } catch (MaximumPoolSizeException e) {
-            BusParkMessage.showMessage(e.getMessage());
+            Message.showMessage(e.getMessage());
             e.printStackTrace();
         }
         if (user != null) {
@@ -62,7 +62,7 @@ public class Buspark {
         try {
             return dbq.getDriverById(id);
         } catch (MaximumPoolSizeException e) {
-            BusParkMessage.showMessage(e.getMessage());
+            Message.showMessage(e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -72,7 +72,7 @@ public class Buspark {
         try {
             return dbq.getBusById(id);
         } catch (MaximumPoolSizeException e) {
-            BusParkMessage.showMessage(e.getMessage());
+            Message.showMessage(e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -82,7 +82,7 @@ public class Buspark {
         try {
             return dbq.getRouteById(id);
         } catch (MaximumPoolSizeException e) {
-            BusParkMessage.showMessage(e.getMessage());
+            Message.showMessage(e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -140,7 +140,7 @@ public class Buspark {
             try {
                 dbq.confirmRoute(driver);
             } catch (MaximumPoolSizeException e) {
-                BusParkMessage.showMessage(e.getMessage());
+                Message.showMessage(e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -150,7 +150,7 @@ public class Buspark {
         try {
             return dbq.getAllDrivers(start, offset);
         } catch (MaximumPoolSizeException e) {
-            BusParkMessage.showMessage(e.getMessage());
+            Message.showMessage(e.getMessage());
             e.printStackTrace();
         }
         return new String[0][];
@@ -160,7 +160,7 @@ public class Buspark {
         try {
             return dbq.getAllBuses(start, offset);
         } catch (MaximumPoolSizeException e) {
-            BusParkMessage.showMessage(e.getMessage());
+            Message.showMessage(e.getMessage());
             e.printStackTrace();
         }
         return new String[0][];
@@ -170,7 +170,7 @@ public class Buspark {
         try {
             return dbq.getAllRoutes(start, offset);
         } catch (MaximumPoolSizeException e) {
-            BusParkMessage.showMessage(e.getMessage());
+            Message.showMessage(e.getMessage());
             e.printStackTrace();
         }
         return new String[0][];
@@ -181,7 +181,7 @@ public class Buspark {
             try {
                 return dbq.getBusById(driver.getBusId());
             } catch (MaximumPoolSizeException e) {
-                BusParkMessage.showMessage(e.getMessage());
+                Message.showMessage(e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -193,7 +193,7 @@ public class Buspark {
             try {
                 return dbq.getRouteByBus(bus.getRouteId());
             } catch (MaximumPoolSizeException e) {
-                BusParkMessage.showMessage(e.getMessage());
+                Message.showMessage(e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -204,5 +204,7 @@ public class Buspark {
         return currentLoggedInUser;
     }
 
-
+    public void setCurrentLoggedInUser(User currentLoggedInUser) {
+        this.currentLoggedInUser = currentLoggedInUser;
+    }
 }
