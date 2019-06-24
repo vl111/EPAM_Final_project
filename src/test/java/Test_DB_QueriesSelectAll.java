@@ -1,5 +1,7 @@
+import controller.Database.ConnectionPool;
 import controller.Database.DB_Queries;
 import controller.buspark.Buspark;
+import controller.exceptions.MaximumPoolSizeException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,13 +11,23 @@ public class Test_DB_QueriesSelectAll extends DB_QueriesTest {
 
     @Before
     public void setup() {
-        dbq = DB_Queries.getInstance();
-        buspark = Buspark.getInstance();
-        if (d == null)
-            dbq.addDriver(testDriverName, "testDriverPassword");
+        dbq = new DB_Queries(ConnectionPool.getConnectionPool());
+        buspark = Buspark.getInstance(ConnectionPool.getConnectionPool());
+        if (d == null) {
+            try {
+                dbq.addDriver(testDriverName, "testDriverPassword");
+            } catch (MaximumPoolSizeException e) {
+                e.printStackTrace();
+            }
+        }
         d = getDriverByName(testDriverName);
-        if (b == null)
-            dbq.addBus(testBusName);
+        if (b == null) {
+            try {
+                dbq.addBus(testBusName);
+            } catch (MaximumPoolSizeException e) {
+                e.printStackTrace();
+            }
+        }
         b = getBusByName(testBusName);
     }
 
@@ -24,9 +36,18 @@ public class Test_DB_QueriesSelectAll extends DB_QueriesTest {
     public void testGetAllDrivers() {
         int selectSize = 10;
         for (int i = 0; i < selectSize; i++) {
-            dbq.addDriver(testDriverName, "1111");
+            try {
+                dbq.addDriver(testDriverName, "1111");
+            } catch (MaximumPoolSizeException e) {
+                e.printStackTrace();
+            }
         }
-        String[][] res = dbq.getAllDrivers(0, selectSize);
+        String[][] res = new String[0][];
+        try {
+            res = dbq.getAllDrivers(0, selectSize);
+        } catch (MaximumPoolSizeException e) {
+            e.printStackTrace();
+        }
         assertEquals(selectSize, res.length);
         removeDriverByName(testDriverName);
     }
@@ -35,9 +56,18 @@ public class Test_DB_QueriesSelectAll extends DB_QueriesTest {
     public void testGetAllBuses() {
         int selectSize = 10;
         for (int i = 0; i < selectSize; i++) {
-            dbq.addBus(testBusName);
+            try {
+                dbq.addBus(testBusName);
+            } catch (MaximumPoolSizeException e) {
+                e.printStackTrace();
+            }
         }
-        String[][] res = dbq.getAllBuses(0, selectSize);
+        String[][] res = new String[0][];
+        try {
+            res = dbq.getAllBuses(0, selectSize);
+        } catch (MaximumPoolSizeException e) {
+            e.printStackTrace();
+        }
         assertEquals(selectSize, res.length);
         removeBusByName(testBusName);
     }
@@ -46,9 +76,18 @@ public class Test_DB_QueriesSelectAll extends DB_QueriesTest {
     public void testGetAllRoutes() {
         int selectSize = 10;
         for (int i = 0; i < selectSize; i++) {
-            dbq.addRoute(testRouteName);
+            try {
+                dbq.addRoute(testRouteName);
+            } catch (MaximumPoolSizeException e) {
+                e.printStackTrace();
+            }
         }
-        String[][] res = dbq.getAllRoutes(0, selectSize);
+        String[][] res = new String[0][];
+        try {
+            res = dbq.getAllRoutes(0, selectSize);
+        } catch (MaximumPoolSizeException e) {
+            e.printStackTrace();
+        }
         assertEquals(selectSize, res.length);
         removeRouteByName(testRouteName);
     }

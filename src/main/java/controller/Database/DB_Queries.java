@@ -1,11 +1,12 @@
 package controller.Database;
 
-import controller.resource_loader.ResourceLoader;
-import model.Driver;
+import controller.exceptions.MaximumPoolSizeException;
 import model.*;
 import org.apache.log4j.Logger;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Savepoint;
 
 /*This class contains all the queries to SQL database.
  * */
@@ -13,501 +14,419 @@ import java.sql.*;
 public class DB_Queries {
     private final static Logger LOG = Logger.getLogger(DB_Queries.class.getSimpleName());
 
-    private static volatile DB_Queries instance = null;
-    private final String NAME = ResourceLoader.getProperties().get("DB_Name").toString();
-    private final String PASSWORD = ResourceLoader.getProperties().get("DB_Password").toString();
-    private final String CONNECTION_URL = ResourceLoader.getProperties().get("connectionURL").toString();
+    private ConnectionPool connPool;
 
-    private volatile Connection conn;
-    private volatile Statement statement;
 
-    private DB_Queries() {
-        synchronized (DB_Queries.class) {
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");//com.mysql.jdbc.Driver
-                LOG.info("SQL connector imported.");
-            } catch (ClassNotFoundException e) {
-                LOG.error("Class not found.");
-                e.printStackTrace();
-            }
+    public DB_Queries(ConnectionPool connPool) {
+        this.connPool = connPool;
+    }
 
+
+    public void addDriver(String name, String password) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
+        try {
+            conn.getStatement().executeUpdate("INSERT INTO drivers(driv_name, password) " +
+                    "VALUES ('" + name + "', '" + password + "');");
+            conn.getConnection().commit();
+        } catch (SQLException e) {
+            LOG.error("SQL exception on adding new driver.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
         }
     }
 
-    public static DB_Queries getInstance() {
-        if (instance == null)
-            synchronized (DB_Queries.class) {
-                if (instance == null) {
-                    instance = new DB_Queries();
-                    LOG.info("New instance of " + DB_Queries.class.getSimpleName()
-                            + " created.");
-                }
-            }
-        return instance;
-    }
-
-    public void addDriver(String name, String password) {
-        synchronized (instance) {
-            openConnection();
-            try {
-                statement.executeUpdate("INSERT INTO drivers(driv_name, password) " +
-                        "VALUES ('" + name + "', '" + password + "');");
-                conn.commit();
-            } catch (SQLException e) {
-                LOG.error("SQL exception on adding new driver.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-            }
-        }
-    }
-
-    public void addAdministrator(String name, String password) {
-        synchronized (instance) {
-            openConnection();
-            try {
-                statement.executeUpdate("INSERT INTO administrators(adm_name, password) " +
-                        "VALUES ('" + name + "', '" + password + "');");
-                conn.commit();
-                LOG.info("Administrator added");
-            } catch (SQLException e) {
-                LOG.error("Exception on adding administrator.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-            }
-        }
-    }
-
-    public void addRoute(String name) {
-        synchronized (instance) {
-            openConnection();
-            try {
-                statement.executeUpdate("INSERT INTO routes(route_name) " +
-                        "VALUES ('" + name + "');");
-                conn.commit();
-                LOG.info("Route added.");
-            } catch (SQLException e) {
-                LOG.error("Exception on adding new route.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-            }
+    public void addAdministrator(String name, String password) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
+        try {
+            conn.getStatement().executeUpdate("INSERT INTO administrators(adm_name, password) " +
+                    "VALUES ('" + name + "', '" + password + "');");
+            conn.getConnection().commit();
+            LOG.info("Administrator added");
+        } catch (SQLException e) {
+            LOG.error("Exception on adding administrator.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
         }
 
     }
 
-    public void addBus(String name) {
-        synchronized (instance) {
-            openConnection();
-            try {
-                statement.executeUpdate("INSERT INTO buses(bus_name) " +
-                        "VALUES ('" + name + "');");
-                conn.commit();
-                LOG.info("Bus added.");
-            } catch (SQLException e) {
-                LOG.error("Exception on adding new bus.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-            }
+    public void addRoute(String name) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
+        try {
+            conn.getStatement().executeUpdate("INSERT INTO routes(route_name) " +
+                    "VALUES ('" + name + "');");
+            conn.getConnection().commit();
+            LOG.info("Route added.");
+        } catch (SQLException e) {
+            LOG.error("Exception on adding new route.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
+        }
+
+    }
+
+    public void addBus(String name) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
+        try {
+            conn.getStatement().executeUpdate("INSERT INTO buses(bus_name) " +
+                    "VALUES ('" + name + "');");
+            conn.getConnection().commit();
+            LOG.info("Bus added.");
+        } catch (SQLException e) {
+            LOG.error("Exception on adding new bus.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
+        }
+
+    }
+
+    public void assignDriverToBus(long driverId, long busId) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
+        try {
+            conn.getStatement().executeUpdate("update drivers set bus_id = " + busId
+                    + ", route_confirmed = false where id = " + driverId + ";");
+            conn.getConnection().commit();
+            LOG.info("Driver assigned to the bus.");
+        } catch (SQLException e) {
+            LOG.error("Exception on assigning driver to the bus.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
         }
     }
 
-    public void assignDriverToBus(long driverId, long busId) {
-        synchronized (instance) {
-            openConnection();
-            try {
-                statement.executeUpdate("update drivers set bus_id = " + busId
-                        + ", route_confirmed = false where id = " + driverId + ";");
-                conn.commit();
-                LOG.info("Driver assigned to the bus.");
-            } catch (SQLException e) {
-                LOG.error("Exception on assigning driver to the bus.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-            }
+    public void unassignDriverFromBus(long driverId) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
+        try {
+            conn.getStatement().executeUpdate("update drivers set bus_id = null" +
+                    ", route_confirmed = false where id = " + driverId + ";");
+            conn.getConnection().commit();
+            LOG.info("Driver unassigned from the bus.");
+        } catch (SQLException e) {
+            LOG.error("Error on unassigning driver from the bus.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
         }
     }
 
-    public void unassignDriverFromBus(long driverId) {
-        synchronized (instance) {
-            openConnection();
-            try {
-                statement.executeUpdate("update drivers set bus_id = null" +
-                        ", route_confirmed = false where id = " + driverId + ";");
-                conn.commit();
-                LOG.info("Driver unassigned from the bus.");
-            } catch (SQLException e) {
-                LOG.error("Error on unassigning driver from the bus.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-            }
+    public void assignBusToRoute(long busId, long routeId) throws SQLException, MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
+        LOG.info("Creating savepoint.");
+        Savepoint savepoint = conn.getConnection().setSavepoint("Savepoint");
+        try {
+            LOG.warn("Assigning bus to route.");
+            conn.getStatement().executeUpdate("update buses set route_id = " + routeId
+                    + " where id = " + busId + ";");
+            conn.getStatement().executeUpdate("update drivers set " +
+                    "route_confirmed = false where bus_id = " + busId + ";");
+            conn.getConnection().commit();
+            LOG.info("Bus assigned to the route.");
+        } catch (SQLException e) {
+            LOG.error("Exception on assigning Bus to the route.");
+            conn.getConnection().rollback(savepoint);
+            LOG.info("Rolled back to the savepoint.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
         }
     }
 
-    public void assignBusToRoute(long busId, long routeId) throws SQLException {
-        synchronized (instance) {
-            openConnection();
-            LOG.info("Creating savepoint.");
-            Savepoint savepoint = conn.setSavepoint("Savepoint");
-            try {
-                LOG.warn("Assigning bus to route.");
-                statement.executeUpdate("update buses set route_id = " + routeId
-                        + " where id = " + busId + ";");
-                statement.executeUpdate("update drivers set " +
-                        "route_confirmed = false where bus_id = " + busId + ";");
-                conn.commit();
-                LOG.info("Bus assigned to the route.");
-            } catch (SQLException e) {
-                LOG.error("Exception on assigning Bus to the route.");
-                conn.rollback(savepoint);
-                LOG.info("Rolled back to the savepoint.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-            }
-        }
-    }
-
-    public void unassignBusFromRoute(long busId) throws SQLException {
-        synchronized (instance) {
-            openConnection();
-            Savepoint savepoint = conn.setSavepoint("Savepoint");
-            try {
-                LOG.warn("Unassigning bus from route.");
-                statement.executeUpdate("update buses set route_id = null" +
-                        " where id = " + busId + ";");
-                statement.executeUpdate("update drivers set " +
-                        "route_confirmed = false where bus_id = " + busId + ";");
-                conn.commit();
-                LOG.info("Bus unassigned from the route.");
-            } catch (SQLException e) {
-                LOG.error("Exception on assigning Bus from the route.");
-                conn.rollback(savepoint);
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-            }
+    public void unassignBusFromRoute(long busId) throws SQLException, MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
+        Savepoint savepoint = conn.getConnection().setSavepoint("Savepoint");
+        try {
+            LOG.warn("Unassigning bus from route.");
+            conn.getStatement().executeUpdate("update buses set route_id = null" +
+                    " where id = " + busId + ";");
+            conn.getStatement().executeUpdate("update drivers set " +
+                    "route_confirmed = false where bus_id = " + busId + ";");
+            conn.getConnection().commit();
+            LOG.info("Bus unassigned from the route.");
+        } catch (SQLException e) {
+            LOG.error("Exception on assigning Bus from the route.");
+            conn.getConnection().rollback(savepoint);
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
         }
     }
 
     //reverses the value of route_confirmed in driver table;
-    public void confirmRoute(Driver driver) {
-        synchronized (instance) {
-            openConnection();
-            try {
-                String toChange = (driver.isRouteConfirmed() ? "false" : "true");
-                statement.executeUpdate("update drivers set route_confirmed = " +
-                        toChange + " where id = " + driver.getId() + ";");
-                conn.commit();
-                LOG.info("route confirmed");
-            } catch (SQLException e) {
-                LOG.error("Exception on confirming route.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-            }
+    public void confirmRoute(Driver driver) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
+        try {
+            String toChange = (driver.isRouteConfirmed() ? "false" : "true");
+            conn.getStatement().executeUpdate("update drivers set route_confirmed = " +
+                    toChange + " where id = " + driver.getId() + ";");
+            conn.getConnection().commit();
+            LOG.info("route confirmed");
+        } catch (SQLException e) {
+            LOG.error("Exception on confirming route.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
+
         }
     }
 
-    public Driver getDriverById(long id) {
-        openConnection();
+    public Driver getDriverById(long id) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
         Driver driver = null;
         ResultSet result;
-        synchronized (instance) {
-            try {
-                LOG.warn("Getting driver by id.");
-                result = statement.executeQuery("select d.driv_name, b.bus_name, b.id," +
-                        " d.route_confirmed  from drivers d " +
-                        " left join buses b on d.bus_id = b.id where d.id = " + id + ";");//, d.route_id not null
-                conn.commit();
-                if (result.next()) {
-                    driver = new Driver(id, result.getString(1), result.getLong(3),
-                            result.getBoolean(4));
-                }
-            } catch (SQLException e) {
-                LOG.error("Error on getting driver by id.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-                return driver;
+        try {
+            LOG.warn("Getting driver by id.");
+            result = conn.getStatement().executeQuery("select d.driv_name, b.bus_name, b.id," +
+                    " d.route_confirmed  from drivers d " +
+                    " left join buses b on d.bus_id = b.id where d.id = " + id + ";");//, d.route_id not null
+            conn.getConnection().commit();
+            if (result.next()) {
+                driver = new Driver(id, result.getString(1), result.getLong(3),
+                        result.getBoolean(4));
             }
+        } catch (SQLException e) {
+            LOG.error("Error on getting driver by id.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
+            return driver;
         }
+
 
     }
 
-    public Bus getBusById(long id) {
-        openConnection();
+    public Bus getBusById(long id) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
         Bus bus = null;
         ResultSet result;
-        synchronized (instance) {
-            try {
-                LOG.warn("Getting bus by id.");
-                result = statement.executeQuery("select bus_name, route_id" +
-                        " from buses where id = " + id + ";");
-                conn.commit();
-                if (result.next()) {
-                    bus = new Bus(id, result.getString(1), result.getLong(2));
-                }
-
-            } catch (SQLException e) {
-                LOG.error("Error on getting bus by id");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-                return bus;
+        try {
+            LOG.warn("Getting bus by id.");
+            result = conn.getStatement().executeQuery("select bus_name, route_id" +
+                    " from buses where id = " + id + ";");
+            conn.getConnection().commit();
+            if (result.next()) {
+                bus = new Bus(id, result.getString(1), result.getLong(2));
             }
+
+        } catch (SQLException e) {
+            LOG.error("Error on getting bus by id");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
+            return bus;
+        }
+
+    }
+
+    public Route getRouteById(long id) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
+        Route route = null;
+        ResultSet result;
+        try {
+            LOG.warn("Getting route by id.");
+            result = conn.getStatement().executeQuery("select id, route_name" +
+                    " from routes where id = " + id + ";");
+            conn.getConnection().commit();
+            if (result.next()) {
+                route = new Route(id, result.getString(2));
+            }
+
+        } catch (SQLException e) {
+            LOG.error("Error on getting route by id.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
+            return route;
         }
     }
 
-    public Route getRouteById(long id) {
-        openConnection();
+
+    public Route getRouteByBus(long id) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
         Route route = null;
         ResultSet result;
-        synchronized (instance) {
-            try {
-                LOG.warn("Getting route by id.");
-                result = statement.executeQuery("select id, route_name" +
-                        " from routes where id = " + id + ";");
-                conn.commit();
-                if (result.next()) {
-                    route = new Route(id, result.getString(2));
-                }
-
-            } catch (SQLException e) {
-                LOG.error("Error on getting route by id.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-                return route;
+        try {
+            result = conn.getStatement().executeQuery("select route_name" +
+                    " from routes where id = " + id + ";");//, d.route_id not null
+            conn.getConnection().commit();
+            if (result.next()) {
+                route = new Route(id, result.getString(1));
             }
-        }
-    }
 
-    public Route getRouteByBus(long id) {
-        openConnection();
-        Route route = null;
-        ResultSet result;
-        synchronized (instance) {
-            try {
-                result = statement.executeQuery("select route_name" +
-                        " from routes where id = " + id + ";");//, d.route_id not null
-                conn.commit();
-                if (result.next()) {
-                    route = new Route(id, result.getString(1));
-                }
-
-            } catch (SQLException e) {
-                LOG.error("Error on getting route by bus");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-                return route;
-            }
+        } catch (SQLException e) {
+            LOG.error("Error on getting route by bus");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
+            return route;
         }
     }
 
     //Method returns logged in use in case success, and null in case fail.
-    public User logInUser(long id, String pass) {
-        openConnection();
+    public User logInUser(long id, String pass) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
         User user = null;
         ResultSet result;
-        synchronized (instance) {
-            try {
-                LOG.warn("Logging in user.");
-                result = statement.executeQuery("select id, driv_name, bus_id, route_confirmed from drivers  " +
-                        "  where id = " + id + " AND password = '" + pass + "';");
+        try {
+            LOG.warn("Logging in user.");
+            result = conn.getStatement().executeQuery("select id, driv_name, bus_id, route_confirmed from drivers  " +
+                    "  where id = " + id + " AND password = '" + pass + "';");
 
+            if (result.next()) {
+                user = new Driver(id, result.getString(2), result.getLong(3),
+                        result.getBoolean(4));
+            } else {
+                result = conn.getStatement().executeQuery("select id, adm_name from administrators  " +
+                        "  where id = " + id + " AND password = '" + pass + "';");
                 if (result.next()) {
-                    user = new Driver(id, result.getString(2), result.getLong(3),
-                            result.getBoolean(4));
-                } else {
-                    result = statement.executeQuery("select id, adm_name from administrators  " +
-                            "  where id = " + id + " AND password = '" + pass + "';");
-                    if (result.next()) {
-                        user = new Administrator(id, result.getString(2));
-                    }
+                    user = new Administrator(id, result.getString(2));
                 }
-                LOG.info("User logged in.");
-            } catch (SQLException e) {
-                LOG.error("Error on log in user");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-                return user;
             }
+            LOG.info("User logged in.");
+        } catch (SQLException e) {
+            LOG.error("Error on log in user");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
+            return user;
         }
 
     }
 
     //Returns an array of drivers, where each row represents a driver
     // and elements in a row are driver`s params
-    public String[][] getAllDrivers(int start, int offset) {
-        openConnection();
+    public String[][] getAllDrivers(int start, int offset) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
         ResultSet result;
         String[][] drivers = new String[0][];
-        synchronized (instance) {
-            try {
-                LOG.warn("Getting drivers.");
-                result = statement.executeQuery("select d.id, d.driv_name, b.id, b.bus_name," +
-                        " r.id, r.route_name, d.route_confirmed  from drivers d " +
-                        " left join buses b on d.bus_id = b.id " +
-                        " left join routes r on b.route_id = r.id" +
-                        " LIMIT " + start + ", " + offset + ";");
-                conn.commit();
+        try {
+            LOG.warn("Getting drivers.");
+            result = conn.getStatement().executeQuery("select d.id, d.driv_name, b.id, b.bus_name," +
+                    " r.id, r.route_name, d.route_confirmed  from drivers d " +
+                    " left join buses b on d.bus_id = b.id " +
+                    " left join routes r on b.route_id = r.id" +
+                    " LIMIT " + start + ", " + offset + ";");
+            conn.getConnection().commit();
 
-                result.last();
-                drivers = new String[result.getRow()][];
-                result.first();
-                int iter = 0;
-                do {
-                    drivers[iter] = new String[]{result.getString(1), result.getString(2),
-                            result.getString(3), result.getString(4),
-                            result.getString(5), result.getString(6),
-                            result.getString(7)};
-                    iter++;
-                } while (result.next());
+            result.last();
+            drivers = new String[result.getRow()][];
+            result.first();
+            int iter = 0;
+            do {
+                drivers[iter] = new String[]{result.getString(1), result.getString(2),
+                        result.getString(3), result.getString(4),
+                        result.getString(5), result.getString(6),
+                        result.getString(7)};
+                iter++;
+            } while (result.next());
 
-            } catch (SQLException e) {
-                LOG.error("Error on getting drivers.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-                return drivers;
-            }
+        } catch (SQLException e) {
+            LOG.error("Error on getting drivers.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
+            return drivers;
         }
+
     }
 
     //Returns an array of parameters of buses.
-    public String[][] getAllBuses(int start, int offset) {
-        openConnection();
+    public String[][] getAllBuses(int start, int offset) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
         ResultSet result;
         String[][] buses = new String[0][];
-        synchronized (instance) {
-            try {
-                LOG.warn("Getting all Buses.");
-                result = statement.executeQuery("select  b.id, b.bus_name," +
-                        " r.id, r.route_name from buses b " +
-                        "  left join routes r on b.route_id = r.id" +
-                        " LIMIT " + start + ", " + offset + ";");
-                conn.commit();
+        try {
+            LOG.warn("Getting all Buses.");
+            result = conn.getStatement().executeQuery("select  b.id, b.bus_name," +
+                    " r.id, r.route_name from buses b " +
+                    "  left join routes r on b.route_id = r.id" +
+                    " LIMIT " + start + ", " + offset + ";");
+            conn.getConnection().commit();
 
-                result.last();
-                buses = new String[result.getRow()][];
-                result.first();
-                int iter = 0;
-                do {
-                    buses[iter] = new String[]{result.getString(1), result.getString(2),
-                            result.getString(3), result.getString(4)};
-                    iter++;
-                } while (result.next());
+            result.last();
+            buses = new String[result.getRow()][];
+            result.first();
+            int iter = 0;
+            do {
+                buses[iter] = new String[]{result.getString(1), result.getString(2),
+                        result.getString(3), result.getString(4)};
+                iter++;
+            } while (result.next());
 
-            } catch (SQLException e) {
-                LOG.error("Error on getting buses.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-                return buses;
-            }
+        } catch (SQLException e) {
+            LOG.error("Error on getting buses.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
+            return buses;
         }
+
     }
 
     //Returns an array of parameters of routes.
-    public String[][] getAllRoutes(int start, int offset) {
-        openConnection();
+    public String[][] getAllRoutes(int start, int offset) throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
         ResultSet result;
         String[][] routes = new String[0][];
-        synchronized (instance) {
-            try {
-                LOG.warn("Getting routes");
-                result = statement.executeQuery("select  id, route_name from routes" +
-                        " LIMIT " + start + ", " + offset + ";");
-                conn.commit();
+        try {
+            LOG.warn("Getting routes");
+            result = conn.getStatement().executeQuery("select  id, route_name from routes" +
+                    " LIMIT " + start + ", " + offset + ";");
+            conn.getConnection().commit();
 
-                result.last();
-                routes = new String[result.getRow()][];
-                result.first();
-                int iter = 0;
-                do {
-                    routes[iter] = new String[]{result.getString(1), result.getString(2)};
-                    iter++;
-                } while (result.next());
+            result.last();
+            routes = new String[result.getRow()][];
+            result.first();
+            int iter = 0;
+            do {
+                routes[iter] = new String[]{result.getString(1), result.getString(2)};
+                iter++;
+            } while (result.next());
 
-            } catch (SQLException e) {
-                LOG.error("Error on getting all routes.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-                return routes;
-            }
+        } catch (SQLException e) {
+            LOG.error("Error on getting all routes.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
+            return routes;
         }
+
     }
 
     //This method adds four tables to DB: drivers, administrators, buses, routes.
-    public void addTables() {
-        synchronized (instance) {
-            openConnection();
-            try {
-                LOG.warn("Adding tables");
-                statement.executeUpdate("create table if not exists drivers(" +
-                        " id integer not null primary key auto_increment," +
-                        " password varchar(30) not null, driv_name varchar(25) not null," +
-                        " bus_id integer references buses(id)," +
-                        " route_confirmed boolean default false);");
-                statement.executeUpdate("create table if not exists administrators(" +
-                        " id integer not null primary key auto_increment," +
-                        " password varchar(30) not null, adm_name varchar(25) not null) AUTO_INCREMENT=100000000;");
-                statement.executeUpdate("create  table if not exists buses(" +
-                        " id integer not null primary key auto_increment," +
-                        " bus_name varchar(25) not null, " +
-                        " route_id integer references routes(id));");
-                statement.executeUpdate("create table if not exists routes(" +
-                        " id integer not null primary key auto_increment," +
-                        " route_name varchar(25) not null);");
-                conn.commit();
-            } catch (SQLException e) {
-                LOG.error("Error on adding tables.");
-                e.printStackTrace();
-            } finally {
-                closeConnection();
-            }
+    public void addTables() throws MaximumPoolSizeException {
+        DB_Connection conn = connPool.getConnection();
+        try {
+            LOG.warn("Adding tables");
+            conn.getStatement().executeUpdate("create table if not exists routes(" +
+                    " id integer not null primary key auto_increment," +
+                    " route_name varchar(25) not null);");
+            conn.getStatement().executeUpdate("create  table if not exists buses(" +
+                    " id integer not null primary key auto_increment," +
+                    " bus_name varchar(25) not null, " +
+                    " route_id integer, FOREIGN KEY (route_id) references routes(id));");
+            conn.getStatement().executeUpdate("create table if not exists drivers(" +
+                    " id integer not null primary key auto_increment," +
+                    " password varchar(30) not null, driv_name varchar(25) not null," +
+                    " bus_id integer, route_confirmed boolean default false," +
+                    " FOREIGN KEY (bus_id) references buses(id));");
+            conn.getStatement().executeUpdate("create table if not exists administrators(" +
+                    " id integer not null primary key auto_increment," +
+                    " password varchar(30) not null, adm_name varchar(25) not null) AUTO_INCREMENT=100000000;");
+
+            conn.getConnection().commit();
+        } catch (SQLException e) {
+            LOG.error("Error on adding tables.");
+            e.printStackTrace();
+        } finally {
+            connPool.retrieveConnection(conn);
         }
+
     }
 
-    private void openConnection() {
-        try {
-            if (conn == null || statement == null) {
-                synchronized (instance) {
-                    if (conn == null || statement == null) {
-                        conn = DriverManager.getConnection(CONNECTION_URL, NAME, PASSWORD);
-                        conn.setAutoCommit(false);
-                        statement = conn.createStatement();
-                        LOG.info("Connected to database.");
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            LOG.error("Error on opening connection.");
-            e.printStackTrace();
-        }
-    }
-
-    private void closeConnection() {
-        try {
-            synchronized (instance) {
-                conn.close();
-                statement.close();
-                conn = null;
-                statement = null;
-                LOG.info("Database connection closed.");
-            }
-        } catch (SQLException e) {
-            LOG.error("Error on closing connection.");
-            e.printStackTrace();
-        }
-    }
 
 }

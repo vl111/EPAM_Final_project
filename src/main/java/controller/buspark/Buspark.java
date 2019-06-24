@@ -1,12 +1,15 @@
 package controller.buspark;
 
+import controller.Database.ConnectionPool;
 import controller.Database.DB_Queries;
+import controller.exceptions.MaximumPoolSizeException;
 import controller.resource_loader.Localization;
 import model.Bus;
 import model.Driver;
 import model.Route;
 import model.User;
 import org.apache.log4j.Logger;
+import view.BusParkMessage;
 
 import java.sql.SQLException;
 
@@ -23,15 +26,15 @@ public class Buspark {
     private User currentLoggedInUser;
     private DB_Queries dbq;
 
-    private Buspark() {
-        dbq = DB_Queries.getInstance();
+    private Buspark(ConnectionPool connPool) {
+        dbq = new DB_Queries(connPool);
     }
 
-    public static Buspark getInstance() {
+    public static Buspark getInstance(ConnectionPool connPool) {
         if (instance == null)
             synchronized (Buspark.class) {
                 if (instance == null) {
-                    instance = new Buspark();
+                    instance = new Buspark(connPool);
                 }
             }
         return instance;
@@ -39,7 +42,12 @@ public class Buspark {
 
     public User logIn(long id, String password) {
         User user = null;
-        user = dbq.logInUser(id, password);
+        try {
+            user = dbq.logInUser(id, password);
+        } catch (MaximumPoolSizeException e) {
+            BusParkMessage.showMessage(e.getMessage());
+            e.printStackTrace();
+        }
         if (user != null) {
             currentLoggedInUser = user;
         }
@@ -51,15 +59,33 @@ public class Buspark {
     }
 
     public Driver getDriverById(long id) {
-        return dbq.getDriverById(id);
+        try {
+            return dbq.getDriverById(id);
+        } catch (MaximumPoolSizeException e) {
+            BusParkMessage.showMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Bus getBusById(long id) {
-        return dbq.getBusById(id);
+        try {
+            return dbq.getBusById(id);
+        } catch (MaximumPoolSizeException e) {
+            BusParkMessage.showMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Route getRouteById(long id) {
-        return dbq.getRouteById(id);
+        try {
+            return dbq.getRouteById(id);
+        } catch (MaximumPoolSizeException e) {
+            BusParkMessage.showMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 
     //sets a driver to a bus (or makes dirver free,
@@ -79,6 +105,9 @@ public class Buspark {
             LOG.error("NullException on assigning driver to a bus.");
             ex.printStackTrace();
             return Localization.getLocalizedValue("wrongInput");
+        } catch (MaximumPoolSizeException e) {
+            e.printStackTrace();
+            return e.getMessage();
         }
     }
 
@@ -99,39 +128,76 @@ public class Buspark {
             LOG.error("Exception on assigning bus to a route");
             e.printStackTrace();
             return Localization.getLocalizedValue("wrongInput");
+        } catch (MaximumPoolSizeException e) {
+            e.printStackTrace();
+            return e.getMessage();
         }
     }
 
     //executes confirmRoute method from the DB_Queries class
     public void confirmRoute(Driver driver) {
         if (driver != null) {
-            dbq.confirmRoute(driver);
+            try {
+                dbq.confirmRoute(driver);
+            } catch (MaximumPoolSizeException e) {
+                BusParkMessage.showMessage(e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 
     public String[][] getAllDriversInfo(int start, int offset) {
-        return dbq.getAllDrivers(start, offset);
+        try {
+            return dbq.getAllDrivers(start, offset);
+        } catch (MaximumPoolSizeException e) {
+            BusParkMessage.showMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return new String[0][];
     }
 
     public String[][] getAllBusesInfo(int start, int offset) {
-        return dbq.getAllBuses(start, offset);
-
+        try {
+            return dbq.getAllBuses(start, offset);
+        } catch (MaximumPoolSizeException e) {
+            BusParkMessage.showMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return new String[0][];
     }
 
     public String[][] getAllRoutesInfo(int start, int offset) {
-        return dbq.getAllRoutes(start, offset);
+        try {
+            return dbq.getAllRoutes(start, offset);
+        } catch (MaximumPoolSizeException e) {
+            BusParkMessage.showMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return new String[0][];
     }
 
     public Bus getBusByDriver(Driver driver) {
-        if (driver != null)
-            return dbq.getBusById(driver.getBusId());
-        else return null;
+        if (driver != null) {
+            try {
+                return dbq.getBusById(driver.getBusId());
+            } catch (MaximumPoolSizeException e) {
+                BusParkMessage.showMessage(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     public Route getRouteByBus(Bus bus) {
-        if (bus != null)
-            return dbq.getRouteByBus(bus.getRouteId());
-        else return null;
+        if (bus != null) {
+            try {
+                return dbq.getRouteByBus(bus.getRouteId());
+            } catch (MaximumPoolSizeException e) {
+                BusParkMessage.showMessage(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     public User getCurrentLoggedInUser() {

@@ -37,8 +37,8 @@ public class UserInterface extends JFrame implements LoginAction, LogoutAction, 
         this.buspark = buspark;
 
         setLayout(new CardLayout());
-        setSize(new Dimension(Integer.parseInt(ResourceLoader.getProperties().get("width").toString()),
-                Integer.parseInt(ResourceLoader.getProperties().get("height").toString())));
+        setSize(new Dimension(Integer.parseInt(ResourceLoader.getProperyByKey("width").toString()),
+                Integer.parseInt(ResourceLoader.getProperyByKey("height").toString())));
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

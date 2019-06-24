@@ -20,8 +20,11 @@ public class ResourceLoader {
         LOG.info("Resourced loaded.");
     }
 
-    public static Map<Object, Object> getProperties() {
-        return properties;
+    //    public static Map<Object, Object> getProperties() {
+//        return properties;
+//    }
+    public static Object getProperyByKey(String key) {
+        return properties.get(key);
     }
 
     private void loadResources() {

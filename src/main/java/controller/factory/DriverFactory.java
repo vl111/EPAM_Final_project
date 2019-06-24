@@ -1,6 +1,8 @@
 package controller.factory;
 
+import controller.Database.ConnectionPool;
 import controller.Database.DB_Queries;
+import controller.exceptions.MaximumPoolSizeException;
 
 import java.util.Random;
 
@@ -9,7 +11,7 @@ public class DriverFactory implements Factory {
     private DB_Queries dbq;
 
     public DriverFactory() {
-        dbq = DB_Queries.getInstance();
+        dbq = new DB_Queries(ConnectionPool.getConnectionPool());
     }
 
     @Override
@@ -19,7 +21,11 @@ public class DriverFactory implements Factory {
         for (int i = 0; i < numberOfObjects; i++) {
             name = "driverName" + rand.nextInt(1000000);
             pass = "driverPassword" + rand.nextInt(1000000);
-            dbq.addDriver(name, pass);
+            try {
+                dbq.addDriver(name, pass);
+            } catch (MaximumPoolSizeException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

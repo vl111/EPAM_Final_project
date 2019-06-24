@@ -1,5 +1,7 @@
+import controller.Database.ConnectionPool;
 import controller.Database.DB_Queries;
 import controller.buspark.Buspark;
+import controller.exceptions.MaximumPoolSizeException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -12,13 +14,23 @@ public class Test_DB_QueriesAssignUnassignDriverBus extends DB_QueriesTest {
 
     @Before
     public void setup() {
-        dbq = DB_Queries.getInstance();
-        buspark = Buspark.getInstance();
-        if (d == null)
-            dbq.addDriver(testDriverName, "testDriverPassword");
+        dbq = new DB_Queries(ConnectionPool.getConnectionPool());
+        buspark = Buspark.getInstance(ConnectionPool.getConnectionPool());
+        if (d == null) {
+            try {
+                dbq.addDriver(testDriverName, "testDriverPassword");
+            } catch (MaximumPoolSizeException e) {
+                e.printStackTrace();
+            }
+        }
         d = getDriverByName(testDriverName);
-        if (b == null)
-            dbq.addBus(testBusName);
+        if (b == null) {
+            try {
+                dbq.addBus(testBusName);
+            } catch (MaximumPoolSizeException e) {
+                e.printStackTrace();
+            }
+        }
         b = getBusByName(testBusName);
     }
 
@@ -34,7 +46,11 @@ public class Test_DB_QueriesAssignUnassignDriverBus extends DB_QueriesTest {
     @Ignore
     @Order(1)
     public void testAddTables() {
-        dbq.addTables();
+        try {
+            dbq.addTables();
+        } catch (MaximumPoolSizeException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

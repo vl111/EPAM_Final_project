@@ -20,8 +20,8 @@ public class AllRowsSelectWindow extends JFrame {
     public AllRowsSelectWindow(String[][] rows, String[] columns, String name) {
         super(name);
         setLayout(new FlowLayout());
-        setSize(new Dimension(Integer.parseInt(ResourceLoader.getProperties().get("width").toString()),
-                Integer.parseInt(ResourceLoader.getProperties().get("height").toString())));
+        setSize(new Dimension(Integer.parseInt(ResourceLoader.getProperyByKey("width").toString()),
+                Integer.parseInt(ResourceLoader.getProperyByKey("height").toString())));
         setResizable(false);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 

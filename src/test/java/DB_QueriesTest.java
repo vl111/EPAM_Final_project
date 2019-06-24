@@ -8,9 +8,9 @@ import model.Route;
 import java.sql.*;
 
 public class DB_QueriesTest {
-    public final String NAME = ResourceLoader.getProperties().get("DB_Name").toString();
-    public final String PASSWORD = ResourceLoader.getProperties().get("DB_Password").toString();
-    public final String CONNECTION_URL = ResourceLoader.getProperties().get("connectionURL").toString();
+    public final String NAME = ResourceLoader.getProperyByKey("DB_Name").toString();
+    public final String PASSWORD = ResourceLoader.getProperyByKey("DB_Password").toString();
+    public final String CONNECTION_URL = ResourceLoader.getProperyByKey("connectionURL").toString();
     public final String testBusName = "testBusName", testDriverName = "testDriverName",
             testRouteName = "testRouteName";
     public Connection conn;

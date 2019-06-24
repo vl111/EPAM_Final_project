@@ -1,6 +1,8 @@
 package controller.factory;
 
+import controller.Database.ConnectionPool;
 import controller.Database.DB_Queries;
+import controller.exceptions.MaximumPoolSizeException;
 
 import java.util.Random;
 
@@ -9,7 +11,7 @@ public class BusFactory implements Factory {
     private DB_Queries dbq;
 
     public BusFactory() {
-        dbq = DB_Queries.getInstance();
+        dbq = new DB_Queries(ConnectionPool.getConnectionPool());
     }
 
     @Override
@@ -18,7 +20,11 @@ public class BusFactory implements Factory {
         String name, pass;
         for (int i = 0; i < numberOfObjects; i++) {
             name = "busName" + rand.nextInt(1000000);
-            dbq.addBus(name);
+            try {
+                dbq.addBus(name);
+            } catch (MaximumPoolSizeException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
