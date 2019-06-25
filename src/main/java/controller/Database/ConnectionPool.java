@@ -10,12 +10,12 @@ import java.util.List;
 public class ConnectionPool {
 
     private static final Logger LOG = Logger.getLogger(ConnectionPool.class.getSimpleName());
-    private static ConnectionPool connectionPool = null;
+    private volatile static ConnectionPool connectionPool = null;
     private final int MAX_POOL_SIZE = Integer.valueOf(ResourceLoader
             .getProperyByKey("maxPoolSize").toString());
 
-    private List<DB_Connection> usedConnections;
-    private List<DB_Connection> connections;
+    private volatile List<DB_Connection> usedConnections;
+    private volatile List<DB_Connection> connections;
 
     private ConnectionPool() {
         usedConnections = new ArrayList<>();
@@ -40,21 +40,25 @@ public class ConnectionPool {
 
     public DB_Connection getConnection() throws MaximumPoolSizeException {
 
-        if (!(usedConnections.size() < MAX_POOL_SIZE)) {
-            String message = "Maximum pool size reached, no available connections";
-            LOG.error(message);
-            throw new MaximumPoolSizeException(message);
-        }
+        synchronized (connectionPool) {
+            if (!(usedConnections.size() < MAX_POOL_SIZE)) {
+                String message = "Maximum pool size reached, no available connections";
+                LOG.error(message);
+                throw new MaximumPoolSizeException(message);
+            }
 
-        DB_Connection connection = connections
-                .remove(connections.size() - 1);
-        usedConnections.add(connection);
-        return connection;
+            DB_Connection connection = connections
+                    .remove(connections.size() - 1);
+            usedConnections.add(connection);
+            return connection;
+        }
     }
 
     public void retrieveConnection(DB_Connection conn) {
-        usedConnections.remove(conn);
-        connections.add(conn);
+        synchronized (connectionPool) {
+            usedConnections.remove(conn);
+            connections.add(conn);
+        }
     }
 
 
